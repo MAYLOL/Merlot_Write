@@ -1,0 +1,183 @@
+syntax = "proto3";
+package service;
+
+service DiaryService {
+    rpc DMLDiary (DMLDiaryRequest) returns (DMLDiaryReply)  {}                          //日记新增、修改、删除接口
+    rpc DMLComment (DMLDiaryCommentRequest) returns (DMLDiaryCommentReply)  {}          //评论回复新增、修改、删除接口
+    rpc DMLLike (DMLDiaryLikeRequest) returns (DMLDiaryLikeReply) {}                    //点赞接口
+    rpc DMLShare (DMLDiaryShareRequest) returns (DMLDiaryShareReply) {}                 //分享接口
+}
+
+//日记-新增、修改、删除请求体
+message DMLDiaryRequest {
+    DiaryAction action   = 1;
+    repeated Diary diarys  = 2;
+}
+//日记-新增、修改、删除响应体
+message DMLDiaryReply {
+    sint64 message = 1;
+}
+
+//评论、回复、相关请求体
+message DMLDiaryCommentRequest{
+    DiaryAction action   = 1;
+    repeated DiaryComment comments   = 2;
+}
+//评论、回复、相关响应体
+message DMLDiaryCommentReply{
+	sint64 message = 1;
+}
+
+//点赞请求体
+message DMLDiaryLikeRequest{
+    DiaryAction action   = 1;
+    repeated DiaryLike likes = 2;
+}
+//点赞响应体
+message DMLDiaryLikeReply{
+    sint64 message = 1;
+}
+
+//分享请求体
+message DMLDiaryShareRequest{
+    DiaryAction action   = 1;
+    repeated DiaryShare shares = 2;
+}
+//分享响应体
+message DMLDiaryShareReply{
+    sint64 message = 1;
+}
+
+//动作结构体
+message DiaryAction{
+   ActionDiaryType ActionValue  = 1;//动作对应的值-枚举常量类型
+}
+
+//点赞结构体
+message DiaryLike{
+    string diaryId = 1;           //日记ID
+    string commentId = 2;         //评论ID
+    string userId = 3;            //用户ID
+    string userName = 4;          //用户名称
+    DiaryImage userPic = 5;       //用户头像
+    sint64 CreatedTime = 6;       //点赞时间
+}
+
+//分享结构体
+message DiaryShare{
+  string diaryId = 1;           //日记ID
+  string commentId = 2;         //评论ID
+  string userId = 3;            //用户ID
+  string toURL = 4;             //分享url
+  sint64 CreatedTime = 5;       //分享时间
+}
+
+//日记结构体
+message Diary{
+    string DiaryID = 1;          //日记ID
+	sint64 CreatedTime = 2;      //创建时间
+	sint64 UpdateTime = 3;       //修改时间
+	string DiaryTitle = 4;       //标题
+	sint64  Status = 5;          //审核状态
+	string Content = 6;          //日记内容-富文本
+
+
+	bool HasUpChain	= 13;        //是否上链
+	double MoneyReward	= 14;    //赏金
+	sint64  MoneyRewardStatus = 15;//赏金状态
+	string  UserID = 16;           //用户ID
+
+    DiaryImage CoverMap = 19;           //封面图
+	repeated DiaryType DiaryTypes  = 20;            //日记分类
+	string DiaryText  = 21;             //文字内容-王瑶解析用
+	repeated DiaryImage Images = 22;    //图片列表-王瑶解析用
+ 	repeated DiaryVideo Videos = 23;    //视频列表-王瑶解析用
+ 	repeated DiaryLabel labels = 24;         //日记标签
+}
+
+//日记类型结构体
+message DiaryType{
+	string DiaryTypeID = 1;               //日记类型ID
+	string ParentID = 2;                  //日记类型父ID
+	sint64 DiaryTypeStatus = 3;           //日记类型状态
+	sint64 DiaryTypeOnlineStatus = 4;     //日记类型上线状态
+	string DiaryTypeName = 5;             //日记类型名称
+	sint64 CreateTime = 6;                //创建时间
+	sint64 UpdateTime = 7;                //修改时间
+	sint64 Sequence  = 8;                 //排序字段
+}
+
+//日记标签结构体
+message DiaryLabel{
+    string LabelID = 1;                 //日记标签
+    string LabelContent = 2;            //日记标签内容
+    sint64 CreateTime = 3;              //创建时间
+    sint64 UpdateTime = 4;              //修改时间
+}
+
+//日记图片结构体
+message DiaryImage{
+    string ImageID  = 1;                //图片ID
+	string ImageName  = 2;              //图片名称
+	string UserID  = 3;                 //用户ID
+	sint64 ImageState = 4;              //图片审核状态
+	string  DiaryID = 5;                //日记ID
+	double Ratio = 6;                   //图片宽高比
+	string ImageType = 7;               //图片类型
+	string ImageUrl = 8;                //图片URL
+	string ImageBase64  = 9;            //图片内容Base64
+	string cause = 10;                  //审核状态原因
+}
+
+//日记视频结构体
+message DiaryVideo{
+    string VideoID  = 1;               //视频ID
+	string VideoName  = 2;             //视频名称
+	string UserID = 3;                 //用户ID
+	sint64 VideoState  = 4;            //视频审核状态
+	string  DiaryID = 5;               //日记ID
+	double Ratio = 6;                  //视频宽高比
+	string VideoUrl = 7;               //视频URL
+	string VideoBase64 = 8;            //视频Base64
+	string VideoType = 9;              //视频类型
+	string VideoImage = 10;            //视频抓取图
+	string VideoImageType  = 11;       //视频抓取图类型
+	string cause = 12;                 //审核状态原因
+}
+
+//评论回复相关结构体
+message DiaryComment{
+	string CommentID = 1;               //评论ID|回复ID
+	string DiaryID  = 2;               //回答ID|评论ID
+	sint64 CreateTime  =3;              //创建的时间
+	sint64 UpDateTime  =4;              //更新的时间
+	bool  Visible      =7;              //可见性
+	string UserID      =8;              //评论者ID
+	string content = 11;                //评论回复内容主体
+}
+
+//日记相关动作类型
+enum ActionDiaryType {                   //枚举消息类型//proto3版本中，首成员必须为0，成员不应有相同的值
+       DIARYS_SAVE = 0;                  //保存所有日记
+       DIARY_SAVE = 1 ;                  //保存单篇日记
+       DIARY_MODIFY = 2;                 //修改单个日记
+       DIARYS_MODIFY = 3;                //修改多个日记
+       DIARY_DELETE = 4;                 //删除单篇日记
+       DIARYS_DELETE = 5;                //删除所有日记
+       DIARY_MODIFY_IMAGE = 6;           //修改日记图片
+       DIARY_MODIFY_VIDEO = 7;           //修改日记视频
+       DIARY_MODIFY_CONTENT = 8;         //修改日记文字
+
+       DIARY_LIKE = 9;                           //日记点赞
+       DIARY_COMMENT_LIKE = 10;                   //评论点赞
+       DIARY_REPLY_LIKE = 11;                     //回复点赞
+
+       DIARY_DISLIKE = 12;                       //取消日记点赞
+       DIARY_COMMENT_DISLIKE = 13;               //取消评论点赞
+       DIARY_REPLY_DISLIKE = 14;                 //取消回复点赞
+
+       DIARY_COMMENT = 15;                 //日记评论
+       DIARY_REPLY = 16;                    //评论回复
+       DIARY_SHARE = 17;                   //分享日记
+}
+

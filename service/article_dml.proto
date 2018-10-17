@@ -1,0 +1,196 @@
+syntax = "proto3";
+package service;
+
+service ArticleService {
+    rpc DMLArticle (DMLArticleRequest) returns (DMLArticleReply)  {}                            //文章新增、修改、删除接口
+    rpc DMLComment (DMLArticleCommentRequest) returns (DMLArticleCommentReply)  {}              //评论回复新增、修改、删除接口
+    rpc DMLLike (DMLArticleLikeRequest) returns (DMLArticleLikeReply) {}                        //点赞接口
+    rpc DMLShare (DMLArticleShareRequest) returns (DMLArticleShareReply) {}                     //分享接口
+}
+
+//文章-新增、修改、删除请求体
+message DMLArticleRequest {
+    ArticleAction action   = 1;
+    repeated Article articles   = 2;
+}
+//文章-新增、修改、删除响应体
+message DMLArticleReply {
+    sint64 message = 1;
+}
+
+//评论、回复、相关请求体
+message DMLArticleCommentRequest{
+    ArticleAction action   = 1;
+    repeated ArticleComment comments   = 2;
+}
+//评论、回复、相关响应体
+message DMLArticleCommentReply{
+	sint64 message = 1;
+}
+
+//点赞请求体
+message DMLArticleLikeRequest{
+    ArticleAction action   = 1;
+    repeated ArticleLike likes = 2;
+}
+//点赞响应体
+message DMLArticleLikeReply{
+    sint64 message = 1;
+}
+
+//分享请求体
+message DMLArticleShareRequest{
+    ArticleAction action   = 1;
+    repeated ArticleShare shares = 2;
+}
+//分享响应体
+message DMLArticleShareReply{
+    sint64 message = 1;
+}
+
+//动作结构体
+message ArticleAction{
+   ActionArticleType ActionValue  = 1;//动作对应的值-枚举常量类型
+}
+
+//点赞结构体
+message ArticleLike{
+    string articleId = 1;            //文章ID
+    string commentId = 2;            //评论ID
+    string userId = 3;               //用户ID
+    string userName = 4;             //用户名称
+    ArticleImage userPic = 5;        //用户头像
+    sint64 CreatedTime = 6;          //点赞时间
+}
+
+//分享结构体
+message ArticleShare{
+  string articleId = 1;             //文章ID
+  string commentId = 2;             //评论ID
+  string userId = 3;                //用户ID
+  string toURL = 4;                 //分享url
+  sint64 CreatedTime = 5;           //分享时间
+}
+
+//文章分页结构体
+message ArticlePage{
+    sint64 pageSize = 1;            //每页条数
+    sint64 offset = 2;              //当前是第几页
+    sint64 total = 3;               //总条数
+    sint64 totalPageSize = 4;       //总页数
+    bool isTop = 5;                 //是否是首页
+    bool isBottom = 6;              //是否是尾页
+}
+
+//文章结构体
+message Article{
+    string ArticleID = 1;            //文章ID
+	sint64 CreatedTime = 2;          //创建时间
+	sint64 UpdateTime = 3;           //修改时间
+	string ArticleTitle = 4;         //文章标题
+	sint64   Status = 5;             //审核状态
+	string Content = 6;              //文章内容-富文本
+
+
+	bool HasUpChain	= 13;            //是否上链
+	double MoneyReward	= 14;        //赏金
+	sint64  MoneyRewardStatus = 15;  //赏金状态
+	string  UserID = 16;             //用户ID
+	ArticleImage UserPortrait  = 17;    //用户头像
+	string UserName   = 18;             //用户名称
+    ArticleImage CoverMap = 19;         //封面图
+	repeated ArticleType ArticleTypes = 20; //文章分类
+	string ArticleText  = 21;               //文字内容-王瑶解析用
+	repeated ArticleImage Images = 22;      //图片列表-王瑶解析用
+ 	repeated ArticleVideo Videos = 23;      //视频列表-王瑶解析用
+ 	repeated ArticleLabel labels = 24;      //文章标签
+}
+
+//文章类型结构体
+message ArticleType{
+	string ArticleTypeID = 1;            //文章类型ID
+	string ParentID = 2;                 //文章类型父ID
+	sint64 ArticleTypeStatus = 3;        //文章类型状态
+	sint64 ArticleTypeOnlineStatus = 4;  //文章类型上线状态
+	bytes ArticleTypeName = 5;          //文章类型名称
+	sint64 CreateTime = 6;               //创建时间
+	sint64 UpdateTime = 7;               //修改时间
+	sint64 Sequence  = 8;                //排序字段
+}
+
+//文章标签结构体
+message ArticleLabel{
+    string LabelID = 1;                 //文章标签
+    string LabelContent = 2;            //文章标签内容
+    sint64 CreateTime = 3;              //创建时间
+    sint64 UpdateTime = 4;              //修改时间
+}
+
+//文章图片结构体
+message ArticleImage{
+    string ImageID  = 1;                //图片ID
+	string ImageName  = 2;              //图片名称
+	string UserID  = 3;                 //用户ID
+	sint64 ImageState = 4;              //图片审核状态
+	string ArticleID = 5;               //文章ID
+	double Ratio = 6;                   //图片宽高比
+	string ImageType = 7;               //图片类型
+	string ImageUrl = 8;                //图片URL
+	string ImageBase64  = 9;            //图片内容Base64
+	string cause = 10;                  //审核状态原因
+}
+
+//文章视频结构体
+message ArticleVideo{
+    string VideoID  = 1;               //视频ID
+	string VideoName  = 2;             //视频名称
+	string UserID = 3;                 //用户ID
+	sint64 VideoState  = 4;            //视频审核状态
+	string ArticleID  = 5;             //文章ID
+	double Ratio = 6;                  //视频宽高比
+	string VideoUrl = 7;               //视频URL
+	string VideoBase64 = 8;            //视频Base64
+	string VideoType = 9;              //视频类型
+	string VideoImage = 10;            //视频抓取图
+	string VideoImageType  = 11;       //视频抓取图类型
+	string cause = 12;                 //审核状态原因
+}
+
+//评论回复相关结构体
+message ArticleComment{
+	string CommentID = 1;               //评论ID|回复ID
+	string ArticleID = 2;               //文章ID|评论ID
+	int64 CreateTime = 3;               //创建的时间
+	int64 UpDateTime = 4;               //更新的时间
+
+	bool  Visible    = 7;               //可见性
+	string UserID    = 8;               //评论者ID
+
+	string content = 11;                //评论回复内容主体
+}
+
+//文章相关动作类型
+enum ActionArticleType {                 //枚举消息类型//proto3版本中，首成员必须为0，成员不应有相同的值
+       ARTICLES_SAVE = 0;                //保存所有文章
+       ARTICLE_SAVE = 1;                 //保存单篇文章
+       ARTICLE_MODIFY = 2;               //修改单个文章
+       ARTICLES_MODIFY = 3;              //修改多个文章
+       ARTICLE_DELETE = 4;               //删除单篇文章
+       ARTICLES_DELETE = 5;              //删除所有文章
+       ARTICLE_MODIFY_IMAGE = 6;         //修改文章图片
+       ARTICLE_MODIFY_VIDEO = 7;         //修改文章视频
+       ARTICLE_MODIFY_CONTENT = 8;       //修改文章文字
+        //点赞相关动作
+       ARTICLE_LIKE = 9;                  //文章点赞
+       ARTICLE_COMMENT_LIKE = 10;         //评论点赞
+       ARTICLE_REPLY_LIKE = 11;           //回复点赞
+       ARTICLE_DISLIKE = 12;              //取消文章点赞
+       ARTICLE_COMMENT_DISLIKE = 13;      //取消评论点赞
+       ARTICLE_REPLY_DISLIKE = 14;        //取消回复点赞
+       //评论回复相关动作
+       ARTICLE_COMMENT = 15;               //文章评论
+       ARTICLE_REPLY = 16;                 //评论回复
+       //分享相关动作
+       ARTICLE_SHARE = 18;                 //分享文章
+}
+

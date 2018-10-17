@@ -1,0 +1,224 @@
+syntax = "proto3";
+package service;
+
+service TopicService {
+    rpc DMLTopic (DMLTopicRequest) returns (DMLTopicReply)  {}                          //话题新增、修改、删除接口
+    rpc DMLAnswer (DMLTopicAnswerRequest) returns (DMLTopicAnswerReply)  {}             //写回答新增、修改、删除接口
+    rpc DMLComment (DMLTopicCommentRequest) returns (DMLTopicCommentReply)  {}          //评论回复新增、修改、删除接口
+    rpc DMLLike (DMLTopicLikeRequest) returns (DMLTopicLikeReply) {}                    //点赞接口
+    rpc DMLShare (DMLTopicShareRequest) returns (DMLTopicShareReply) {}                 //分享接口
+}
+
+//话题-新增、修改、删除请求体
+message DMLTopicRequest {
+    TopicAction action   = 1;
+    repeated Topic topics  = 2;
+}
+
+
+//话题-新增、修改、删除响应体
+message DMLTopicReply {
+    sint64 message = 1;
+}
+
+//回答-新增、修改、删除请求体
+message DMLTopicAnswerRequest {
+    TopicAction action   = 1;
+    repeated Answer answers  = 2;
+}
+//回答-新增、修改、删除响应体
+message DMLTopicAnswerReply {
+    sint64 message = 1;
+}
+
+//评论、回复、相关请求体
+message DMLTopicCommentRequest{
+    TopicAction action   = 1;
+    repeated TopicComment comments   = 2;
+}
+//评论、回复、相关响应体
+message DMLTopicCommentReply{
+	sint64 message = 1;
+}
+
+//点赞请求体
+message DMLTopicLikeRequest{
+    TopicAction action   = 1;
+    repeated TopicLike likes = 2;
+}
+//点赞响应体
+message DMLTopicLikeReply{
+    sint64 message = 1;
+}
+
+//分享请求体
+message DMLTopicShareRequest{
+    TopicAction action   = 1;
+    repeated TopicShare shares = 2;
+}
+//分享响应体
+message DMLTopicShareReply{
+    sint64 message = 1;
+}
+
+//动作结构体
+message TopicAction{
+   ActionTopicType ActionValue  = 1;//动作对应的值-枚举常量类型
+}
+
+//点赞结构体
+message TopicLike{
+    string topicId = 1;         //话题ID
+    string answerId = 2;        //回答ID
+    string commentId = 3;       //评论ID
+    string userId = 4;          //用户ID
+
+    sint64 CreatedTime = 7;     //点赞时间
+}
+
+//分享结构体
+message TopicShare{
+  string topicId = 1;       //话题ID
+  string answerId = 2;      //回答ID
+  string commentId = 3;     //评论ID
+  string userId = 4;        //用户ID
+  string toURL = 5;        //分享url
+  sint64 CreatedTime = 6;  //分享时间
+}
+
+//话题结构体
+message Topic{
+    string TopicID = 1;          //话题ID
+	sint64 CreatedTime = 2;     //创建时间
+	sint64 UpdateTime = 3;      //修改时间
+	string TopicTitle = 4;      //标题
+	sint64  Status = 5;          //审核状态
+	string Content = 6;         //话题内容-富文本
+	bool HasUpChain	= 13;       //是否上链
+	double MoneyReward	= 14;   //赏金
+	sint64  MoneyRewardStatus = 15;//赏金状态
+	string  UserID = 16;           //用户ID
+
+	string UserName   = 18;             //用户名称
+    TopicImage CoverMap = 19;           //封面图
+	sint64 TopicType  = 20;              //话题分类0:推荐话题1:热门话题
+	sint64 TopicJoinStatus = 21;         //参与状态
+	string TopicText  = 22;             //文字内容-王瑶解析用
+	repeated TopicImage Images = 23;    //图片列表-王瑶解析用
+ 	repeated TopicVideo Videos = 24;    //视频列表-王瑶解析用
+ 	repeated TopicLabel labels = 25;         //话题标签
+}
+
+//回答结构体
+message Answer{
+    string AnswerID = 1;                        //回答ID
+	sint64 CreatedTime = 2;                     //创建时间
+	sint64 UpdateTime = 3;                      //修改时间
+	string AnswerTitle = 4;                     //标题
+	sint64  Status = 5;                         //审核状态
+	string Content = 6;                         //回答内容-富文本
+
+
+	bool HasUpChain	= 13;                       //是否上链
+	double MoneyReward	= 14;                   //赏金
+	sint64  MoneyRewardStatus = 15;             //赏金状态
+	string  UserID = 16;                        //用户ID
+
+
+    TopicImage CoverMap = 19;                   //封面图
+	string TopicID  = 20;                       //话题ID
+	string TopicText  = 21;                     //文字内容-王瑶解析用
+	repeated TopicImage Images = 22;            //图片列表-王瑶解析用
+ 	repeated TopicVideo Videos = 23;            //视频列表-王瑶解析用
+ 	repeated TopicLabel labels = 24;            //话题标签
+}
+
+//topic标签结构体
+message TopicLabel{
+    string LabelID = 1;                 //话题标签ID
+    string LabelContent = 2;            //话题标签内容
+    sint64 CreateTime = 3;              //创建时间
+    sint64 UpdateTime = 4;              //修改时间
+}
+
+//话题图片结构体
+message TopicImage{
+    string ImageID  = 1;                //图片ID
+	string ImageName  = 2;              //图片名称
+	string UserID  = 3;                 //用户ID
+	sint64 ImageState = 4;              //图片审核状态
+	string TopicID = 5;                 //话题ID
+	double Ratio = 6;                   //图片宽高比
+	string ImageType = 7;               //图片类型
+	string ImageUrl = 8;                //图片URL
+	string ImageBase64  = 9;            //图片内容Base64
+	string cause  = 10;                 //审核失败原因
+}
+
+//话题视频结构体
+message TopicVideo{
+    string VideoID  = 1;               //视频ID
+	string VideoName  = 2;             //视频名称
+	string UserID = 3;                 //用户ID
+	sint64 VideoState  = 4;            //视频审核状态
+	string ArticleID  = 5;             //文章ID
+	double Ratio = 6;                  //视频宽高比
+	string VideoUrl = 7;               //视频URL
+	string VideoBase64 = 8;            //视频Base64
+	string VideoType = 9;              //视频类型
+	string VideoImage = 10;            //视频抓取图
+	string VideoImageType  = 11;       //视频抓取图类型
+	string cause  = 12;                //审核失败原因
+}
+
+//评论回复相关结构体
+message TopicComment{
+	string CommentID =1;        //评论ID|回复ID
+	string AnswerID  =2;        //回答ID|评论ID
+	sint64 CreateTime  =3;      //创建的时间
+	sint64 UpDateTime  =4;      //更新的时间
+
+	bool  Visible      =7;      //可见性
+	string UserID      =8;      //评论者ID
+
+	string content = 11;        //评论回复主体内容
+}
+
+//话题相关动作类型
+enum ActionTopicType {                   //枚举消息类型//proto3版本中，首成员必须为0，成员不应有相同的值
+       TOPICS_SAVE = 0;                  //保存所有话题
+       TOPIC_SAVE = 1 ;                  //保存单篇话题
+       TOPIC_MODIFY = 2;                 //修改单个话题
+       TOPICS_MODIFY = 3;                //修改多个话题
+       TOPIC_DELETE = 4;                 //删除单篇话题
+       TOPICS_DELETE = 5;                //删除所有话题
+
+       ANSWERS_SAVE = 6;                   //保存所有回答
+       ANSWER_SAVE = 7;                    //保存单个回答
+       ANSWER_MODIFY = 8;                  //修改单个回答
+       ANSWERS_MODIFY = 9;                 //修改多个回答
+       ANSWER_DELETE = 10;                 //删除单个回答
+       ANSWERS_DELETE = 11;                //删除所有回答
+
+       ANSWER_MODIFY_IMAGE = 12;          //修改回答图片
+       ANSWER_MODIFY_VIDEO = 13;          //修改回答视频
+       ANSWER_MODIFY_CONTENT = 14;        //修改回答文字
+
+       TOPIC_LIKE = 15;                          //话题点赞
+       ANSWER_LIKE = 16;                         //回答点赞
+       TOPIC_COMMENT_LIKE = 17;                  //评论点赞
+       TOPIC_REPLY_LIKE = 18;                    //回复点赞
+
+       TOPIC_DISLIKE = 19;                       //取消话题点赞
+       ANSWER_DISLIKE = 20;                      //取消回答点赞
+       TOPIC_COMMENT_DISLIKE = 21;               //取消评论点赞
+       TOPIC_REPLY_DISLIKE = 22;                 //取消回复点赞
+
+       TOPIC_COMMENT_ANSWER = 23;                //回答评论
+       TOPIC_COMMENT_REPLY = 24;                  //评论回复
+
+       TOPIC_SHARE = 25;                        //分享话题
+       ANSWER_SHARE= 26;                        //分享回答
+}
+
+
